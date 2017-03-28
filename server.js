@@ -4,7 +4,6 @@ var bodyParser = require("body-parser");
 var md5 = require('MD5');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
-// var passport = require('passport');
 var config = require('./config/database');
 var rest = require("./REST.js");
 var app = express();
@@ -41,8 +40,6 @@ REST.prototype.configureExpress = function (connection) {
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
     app.use(morgan('dev'));
-    // Use the passport package in our application
-    // app.use(passport.initialize());
     var router = express.Router();
 
     router.post('/authenticate', function (req, res) {
