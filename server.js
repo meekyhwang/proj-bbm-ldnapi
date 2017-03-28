@@ -4,9 +4,12 @@ var bodyParser = require("body-parser");
 var md5 = require('MD5');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
-var config = require('./config');
+// var passport = require('passport');
+var config = require('./config/database');
 var rest = require("./REST.js");
 var app = express();
+var port = process.env.PORT || 3000;
+var allowed_sites = require('./config/sites');
 
 function REST() {
     var self = this;
@@ -34,26 +37,35 @@ REST.prototype.connectMysql = function () {
 
 REST.prototype.configureExpress = function (connection) {
     var self = this;
-    app.set('superSecret', config.secret);
+    app.set('siteSecret', config.secret);
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
     app.use(morgan('dev'));
+    // Use the passport package in our application
+    // app.use(passport.initialize());
     var router = express.Router();
 
-    router.get('/authenticate', function (req, res) {
-        //TODO Need to hide this in the future
-        // create a token
-        var token = jwt.sign({
-            data: 'ldnscreen'
-        }, app.get('superSecret'), {
-            expiresInMinutes: 1440 // expires in 24 hours
-        });
+    router.post('/authenticate', function (req, res) {
+        //TODO Cleanup
+        allowed_sites.find({
+            name: req.body.name
+        }, function (err, site) {
+            if (err) throw err;
 
-        // return the information including token as JSON
-        res.json({
-            success: true,
-            message: 'Enjoy your token!',
-            token: token
+            if (!site) {
+                res.send({success: false, msg: 'Authentication failed. Site not found.'});
+            } else {
+                // check if password matches
+                if( site.password == req.body.password ){
+                    var token = jwt.sign(site, config.secret, {
+                        expiresIn: '24h' // expires in 24 hours
+                    });
+                    // return the information including token as JSON
+                    res.json({success: true, message: 'Enjoy your token!', token: token});
+                }else {
+                    res.send({success: false, msg: 'Authentication failed. Wrong password.'});
+                }
+            }
         });
     });
 
@@ -67,7 +79,7 @@ REST.prototype.configureExpress = function (connection) {
         if (token) {
 
             // verifies secret and checks exp
-            jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+            jwt.verify(token, app.get('siteSecret'), function (err, decoded) {
                 if (err) {
                     return res.json({success: false, message: 'Failed to authenticate token.'});
                 } else {
@@ -95,8 +107,8 @@ REST.prototype.configureExpress = function (connection) {
 }
 
 REST.prototype.startServer = function () {
-    app.listen(3000, function () {
-        console.log("All right ! I am alive at Port 3000.");
+    app.listen(port, function () {
+        console.log("All right ! I am alive at Port " + port);
     });
 }
 
