@@ -1,6 +1,5 @@
 var express = require("express");
 var bodyParser = require("body-parser");
-var md5 = require('MD5');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
 var config = require('./config/database');
