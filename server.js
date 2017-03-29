@@ -1,38 +1,25 @@
 var express = require("express");
-var mysql = require("mysql");
 var bodyParser = require("body-parser");
 var md5 = require('MD5');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
 var config = require('./config/database');
-var rest = require("./REST.js");
+var allowed_sites = require('./config/sites');
+var database = require("./dbconnection.js");
+var rest = require("./routes.js");
 var app = express();
 var port = process.env.PORT || 3000;
-var allowed_sites = require('./config/sites');
 
 function REST() {
     var self = this;
-    self.connectMysql();
-};
-
-REST.prototype.connectMysql = function () {
-    var self = this;
-    var pool = mysql.createPool({
-        connectionLimit: 100,
-        host: config.db_host,
-        user: config.db_user,
-        password: config.db_password,
-        database: config.database,
-        debug: true
-    });
-    pool.getConnection(function (err, connection) {
+    database.getConnection(function (err, connection) {
         if (err) {
             self.stop(err);
         } else {
             self.configureExpress(connection);
         }
     });
-}
+};
 
 REST.prototype.configureExpress = function (connection) {
     var self = this;
@@ -53,13 +40,13 @@ REST.prototype.configureExpress = function (connection) {
                 res.send({success: false, msg: 'Authentication failed. Site not found.'});
             } else {
                 // check if password matches
-                if( site.password == req.body.password ){
+                if (site.password == req.body.password) {
                     var token = jwt.sign(site, config.secret, {
                         expiresIn: '24h' // expires in 24 hours
                     });
                     // return the information including token as JSON
                     res.json({success: true, message: 'Enjoy your token!', token: token});
-                }else {
+                } else {
                     res.send({success: false, msg: 'Authentication failed. Wrong password.'});
                 }
             }
@@ -98,8 +85,9 @@ REST.prototype.configureExpress = function (connection) {
         }
     });
 
+
     app.use('/api', router);
-    var rest_router = new rest(router, connection, md5);
+    var rest_router = new rest(router, connection);
     self.startServer();
 }
 

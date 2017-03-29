@@ -11,6 +11,7 @@
     "jsonwebtoken": "^7.3.0",
     "morgan": "^1.8.1",
     "mysql": "~2.5.5",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "forever": "^0.14.41"
   }
 }
