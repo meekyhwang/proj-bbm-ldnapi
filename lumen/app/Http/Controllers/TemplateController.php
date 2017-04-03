@@ -25,10 +25,10 @@ class TemplateController extends Controller
 	    return $response;
     }
 
-    public function getTemplatebyId(Request $request, $template_id = '')
+    public function getTemplateById(Request $request, $template_id = '')
     {
 	    $template = new Template();
-	    $templates = $template->getPlaylistById($template_id);
+	    $templates = $template->getTemplateById($template_id);
 
 	    /**
 	     * JSON response & JSONP callback

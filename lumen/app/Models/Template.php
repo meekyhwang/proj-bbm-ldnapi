@@ -20,7 +20,7 @@ class Template extends Post
 	 *
 	 * @return mixed
 	 */
-	public function getTemplatesById($template_id='')
+	public function getTemplateById($template_id='')
 	{
 		return $this->getPostsByPostId($template_id, 'template');
 	}
