@@ -12,11 +12,31 @@ class TemplateController extends Controller
 
     public function getTemplates(Request $request)
     {
-        return print_r($request);
+	    $template = new Template();
+	    $templates = $template->getTemplates('template');
+
+	    /**
+	     * JSON response & JSONP callback
+	     *
+	     * @see \Illuminate\Http\JsonResponse
+	     */
+	    $response = response()->json($templates)->setCallback($request->input('callback'));
+
+	    return $response;
     }
 
     public function getTemplatebyId(Request $request, $template_id = '')
     {
-        return print_r($template_id);
+	    $template = new Template();
+	    $templates = $template->getPlaylistById($template_id);
+
+	    /**
+	     * JSON response & JSONP callback
+	     *
+	     * @see \Illuminate\Http\JsonResponse
+	     */
+	    $response = response()->json($templates)->setCallback($request->input('callback'));
+
+	    return $response;
     }
 }

@@ -14,4 +14,14 @@ class Template extends Post
     {
         return $this->getPostsByPostType('template');
     }
+
+	/**
+	 * Fetch template by Id
+	 *
+	 * @return mixed
+	 */
+	public function getTemplatesById($template_id='')
+	{
+		return $this->getPostsByPostId($template_id, 'template');
+	}
 }
