@@ -42,7 +42,7 @@ var Templates = {
                 if(rows.length > 0){
                     var meta = [];
                     for(var i=0; i > rows.length; i++) {
-                        meta.push({ 'key': row[i].RowDataPacket.meta_key, 'value' : row[i].RowDataPacket.meta_value });
+                        meta.push({ 'key': row[i].RowDataPacket.meta_key, 'value': row[i].RowDataPacket.meta_value });
                     }
                     console.log(meta);
                 }else {
