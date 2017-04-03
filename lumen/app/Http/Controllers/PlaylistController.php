@@ -20,16 +20,17 @@ class PlaylistController extends Controller
     public function getPlaylists(Request $request)
     {
         $playlist = new Playlist();
-        $data = [$playlist->getPlaylists('playlist')->render()];
+        $playlists = $playlist->getPlaylists('playlist');
 
         /**
          * JSON response & JSONP callback
          *
          * @see \Illuminate\Http\JsonResponse
          */
-        $response = response()->json($data)->setCallback($request->input('callback'));
+        $response = response()->json($playlists)->setCallback($request->input('callback'));
 
-        return $this->cache_json_response($response);
+        return $response;
+        // return $this->cache_json_response($response);
     }
 
     /**
@@ -43,7 +44,17 @@ class PlaylistController extends Controller
      */
     public function getPlaylistById(Request $request, $playlist_id = '')
     {
-        return print_r($playlist_id);
+        $playlist = new Playlist();
+        $playlists = $playlist->getPlaylistById($playlist_id);
+
+        /**
+         * JSON response & JSONP callback
+         *
+         * @see \Illuminate\Http\JsonResponse
+         */
+        $response = response()->json($playlists)->setCallback($request->input('callback'));
+
+        return $response;
         // $template = $this->get_template($version);
         // $model    = new Menu();
         //

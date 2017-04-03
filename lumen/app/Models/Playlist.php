@@ -14,4 +14,13 @@ class Playlist extends Post
     {
         return $this->getPostsByPostType('playlist');
     }
+    /**
+     * Fetch playlist by Id
+     *
+     * @return mixed
+     */
+    public function getPlaylistById($playlist_id='')
+    {
+        return $this->getPostsByPostId($playlist_id, 'playlist');
+    }
 }
