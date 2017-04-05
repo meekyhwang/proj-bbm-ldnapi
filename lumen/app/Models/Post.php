@@ -43,7 +43,7 @@ class Post
 	            $metaArray[$meta_item->meta_key] = $meta_item->meta_value;
             }
         }
-        $postArray['meta'] = $metaArray;
+        $postArray['meta'] = $this->resolveTemplateMeta($metaArray);
 
         $return = new Collection($postArray);
         return $return;
@@ -79,7 +79,7 @@ class Post
 
 	    $post_types = DB::table('wp_posts')
 		    ->select('ID','post_type')
-		    ->whereIn('ID', $post_ids)//'['.implode(',',$post_ids).']')
+		    ->whereIn('ID', $post_ids)
 		    ->get();
 
 	    return $post_types;
@@ -97,13 +97,36 @@ class Post
 		foreach($post_types as $post){
 			if('template_bundle' == $post->post_type){
 				$template_bundle_list = $this->getFieldsByPostId($post->ID, 'template_list');
-
-				$final_template_list = array_merge($final_template_list, unserialize($template_bundle_list[0]->meta_value));
+				foreach(unserialize($template_bundle_list[0]->meta_value) as $template){
+                    $final_template_list[$template] = $this->getPostsByPostId($template, 'template');
+                }
 			}else{
-				$final_template_list[] = $post->ID;
+				$final_template_list[$post->ID] = $this->getPostsByPostId($post->ID, 'template');
 			}
 		}
 
 		return $final_template_list;
+    }
+
+    protected function resolveTemplateMeta($metaArray){
+        $cleaned_meta = [ ];
+        if(!empty($metaArray)){
+
+            foreach($metaArray as $key => $value){
+                if($key=='components'){
+                    continue;
+                }else{
+                    preg_match('/^(components_0_)(.*)/',$key, $results);
+                    if(!empty($results)){
+                        if(!empty($results[2])){
+                            $cleaned_meta[$results[2]] = $value;
+                        }
+                    }else{
+                        $cleaned_meta[$key] = $value;
+                    }
+                }
+            }
+        }
+        return $cleaned_meta;
     }
 }
